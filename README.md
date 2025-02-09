@@ -34,20 +34,6 @@ Ensuring **consistent and reliable network connectivity** across all hospitals i
 - **Blockchain-Based Medical Records** 🔗 (Unalterable and tamper-proof patient data)
 - **Telemedicine & Virtual Consultations** 🖥️ (Remote doctor consultations from anywhere)
 
-## 🛠️ Installation & Setup
-```bash
-# Clone the repository
-
-# Navigate into the project directory
-cd MediNexus
-
-# Install dependencies
-npm install  # or yarn install
-
-# Start the development server
-npm start  # or yarn start
-```
-
 
 
 🚀 This platform aims to revolutionize the healthcare system by making medical services **faster, safer, and more accessible** for everyone.
