@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Specialist Doctors Schedule</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Root Variables */
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --accent: #e11d48;
+            --background: #f8fafc;
+            --text: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .branding h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .controls .fa-bell {
+            font-size: 1.2rem;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            height: calc(100vh - 120px);
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .nav-item span {
+            display: none;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+            transform: translateX(8px);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        .nav-item span {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 290px;
+            margin-top: 100px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.collapsed {
+            margin-left: 110px;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f7ff;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            color: #1a73e8;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            background: #1a73e8;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: #1557b0;
+        }
+
+        .doctor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .doctor-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .available {
+            background: #e8f5e9;
+            color: #43a047;
+        }
+
+        .unavailable {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .doctor-photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+
+        .schedule-timeline {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .time-slot {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .book-btn {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            background: #1a73e8;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .book-btn:hover {
+            background: #1557b0;
+        }
+
+        /* Appointment Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Specialist Doctors Availability</h1>
+            <p>View real-time availability and schedule appointments</p>
+        </div>
+        <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="nav-item active" data-page="dashboard">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="patients">
+            <i class="fas fa-user-injured"></i>
+            <span>Patients</span>
+        </div>
+        <div class="nav-item" data-page="facilities">
+            <i class="fas fa-hospital"></i>
+            <span>Facilities</span>
+        </div>
+        <div class="nav-item" data-page="pharmacy">
+            <i class="fas fa-prescription"></i>
+            <span>Pharmacy</span>
+        </div>
+        <div class="nav-item" data-page="analytics">
+            <i class="fas fa-chart-line"></i>
+            <span>Analytics</span>
+        </div>
+        <div class="nav-item" data-page="connection">
+            <i class="fas fa-network-wired"></i>
+            <span>Hospital to Hospital</span>
+        </div>
+        <div class="nav-item" data-page="doctors">
+            <i class="fas fa-user-md"></i>
+            <span>Doctors</span>
+        </div>
+        <div class="nav-item" data-page="special-doctor">
+            <i class="fas fa-user-nurse"></i>
+            <span>Special Doctor</span>
+        </div>
+    </nav>
+
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="filterDoctors('all')">All Specialists</button>
+            <button class="filter-btn" onclick="filterDoctors('available')">Available Now</button>
+        </div>
+
+        <div class="doctor-grid" id="doctorGrid">
+            <!-- Cardiologist -->
+            <div class="doctor-card" data-availability="available" data-specialization="Cardiology">
+                <span class="status-badge available">Available Now</span>
+                <img src="https://via.placeholder.com/100" alt="Dr. Sharma" class="doctor-photo">
+                <h2>Dr. Ramesh Sharma</h2>
+                <p class="department">Cardiology</p>
+                
+                <div class="schedule-timeline">
+                    <h3>Today's Schedule</h3>
+                    <div class="time-slot">
+                        <span>10:00 AM</span>
+                        <span>12:00 PM</span>
+                    </div>
+                    <div class="time-slot">
+                        <span>2:00 PM</span>
+                        <span>4:00 PM</span>
+                    </div>
+                </div>
+                
+                <button class="book-btn" onclick="openBookingModal('Dr. Ramesh Sharma')">
+                    Book Appointment
+                </button>
+            </div>
+
+            <!-- Neurologist -->
+            <div class="doctor-card" data-availability="unavailable" data-specialization="Neurology">
+                <span class="status-badge unavailable">Offline</span>
+                <img src="https://via.placeholder.com/100" alt="Dr. Gupta" class="doctor-photo">
+                <h2>Dr. Anjali Gupta</h2>
+                <p class="department">Neurology</p>
+                
+                <div class="schedule-timeline">
+                    <h3>Today's Schedule</h3>
+                    <div class="time-slot">
+                        <span>11:00 AM</span>
+                        <span>1:00 PM</span>
+                    </div>
+                    <div class="time-slot">
+                        <span>3:00 PM</span>
+                        <span>5:00 PM</span>
+                    </div>
+                </div>
+                
+                <button class="book-btn" disabled>Not Available</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <h2 id="modalDoctorName"></h2>
+            <form id="appointmentForm" onsubmit="bookAppointment(event)">
+                <div class="form-group">
+                    <label>Select Time Slot:</label>
+                    <select id="timeSlot" required>
+                        <option value="10:00 AM">10:00 AM - 11:00 AM</option>
+                        <option value="11:00 AM">11:00 AM - 12:00 PM</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Patient Name:</label>
+                    <input type="text" id="patientName" required>
+                </div>
+                
+                <button type="submit" class="book-btn">Confirm Appointment</button>
+                <button type="button" class="book-btn" onclick="closeModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Filter doctors
+        function filterDoctors(filter) {
+            const cards = document.querySelectorAll('.doctor-card');
+            cards.forEach(card => {
+                card.style.display = (filter === 'all' || card.dataset.availability === filter) ? 
+                    'block' : 'none';
+            });
+        }
+
+        // Modal handling
+        function openBookingModal(doctorName) {
+            document.getElementById('modalDoctorName').textContent = doctorName;
+            document.getElementById('bookingModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('bookingModal').style.display = 'none';
+        }
+
+        // Appointment booking
+        function bookAppointment(event) {
+            event.preventDefault();
+            const doctorName = document.getElementById('modalDoctorName').textContent;
+            const timeSlot = document.getElementById('timeSlot').value;
+            const patientName = document.getElementById('patientName').value;
+            
+            alert(`Appointment booked!\nDoctor: ${doctorName}\nTime: ${timeSlot}\nPatient: ${patientName}`);
+            closeModal();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('bookingModal')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

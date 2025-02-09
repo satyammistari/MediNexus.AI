@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy - MediNexus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Root Variables */
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --accent: #e11d48;
+            --background: #f8fafc;
+            --text: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .branding h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .controls .fa-bell {
+            font-size: 1.2rem;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            height: calc(100vh - 120px);
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .nav-item span {
+            display: none;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+            transform: translateX(8px);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        .nav-item span {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 290px;
+            margin-top: 100px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.collapsed {
+            margin-left: 110px;
+        }
+        /* Add these styles to your existing CSS */
+        .pharmacy-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .pharmacy-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .pharmacy-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .pharmacy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .pharmacy-header h3 {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .pharmacy-header i {
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .medicine-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .medicine-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .medicine-item:last-child {
+            border-bottom: none;
+        }
+
+        .medicine-name {
+            font-weight: 500;
+        }
+
+        .medicine-stock {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .low-stock {
+            color: #dc2626;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e40af;
+        }
+
+        .btn-secondary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #9f1239;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 2rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table th {
+            background: var(--primary);
+            color: white;
+        }
+
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="branding">
+            <h1>MediNexus</h1>
+        </div>
+        <div class="controls">
+            <i class="fas fa-bell"></i>
+            <div class="user-profile">
+                <img src="https://source.unsplash.com/random/400x400" alt="Profile">
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="nav-item active" data-page="dashboard">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="patients">
+            <i class="fas fa-user-injured"></i>
+            <span>Patients</span>
+        </div>
+        <div class="nav-item" data-page="facilities">
+            <i class="fas fa-hospital"></i>
+            <span>Facilities</span>
+        </div>
+        <div class="nav-item" data-page="pharmacy">
+            <i class="fas fa-prescription"></i>
+            <span>Pharmacy</span>
+        </div>
+        <div class="nav-item" data-page="analytics">
+            <i class="fas fa-chart-line"></i>
+            <span>Analytics</span>
+        </div>
+        <div class="nav-item" data-page="connection">
+            <i class="fas fa-network-wired"></i>
+            <span>Hospital to Hospital</span>
+        </div>
+        <div class="nav-item" data-page="doctors">
+            <i class="fas fa-user-md"></i>
+            <span>Doctors</span>
+        </div>
+        <div class="nav-item" data-page="special-doctor">
+            <i class="fas fa-user-nurse"></i>
+            <span>Special Doctor</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1>Pharmacy Management</h1>
+        <input type="text" class="search-bar" placeholder="Search medicines...">
+
+        <!-- Pharmacy Cards -->
+        <div class="pharmacy-container">
+            <!-- Medicine Inventory -->
+            <div class="pharmacy-card">
+                <div class="pharmacy-header">
+                    <h3>Medicine Inventory</h3>
+                    <i class="fas fa-pills"></i>
+                </div>
+                <ul class="medicine-list">
+                    <li class="medicine-item">
+                        <span class="medicine-name">Paracetamol</span>
+                        <span class="medicine-stock">120 in stock</span>
+                    </li>
+                    <li class="medicine-item">
+                        <span class="medicine-name">Amoxicillin</span>
+                        <span class="medicine-stock low-stock">15 in stock</span>
+                    </li>
+                    <li class="medicine-item">
+                        <span class="medicine-name">Ibuprofen</span>
+                        <span class="medicine-stock">80 in stock</span>
+                    </li>
+                    <li class="medicine-item">
+                        <span class="medicine-name">Omeprazole</span>
+                        <span class="medicine-stock">45 in stock</span>
+                    </li>
+                </ul>
+                <div class="action-buttons">
+                    <button class="btn btn-primary">View All</button>
+                    <button class="btn btn-secondary">Reorder</button>
+                </div>
+            </div>
+
+            <!-- Prescription Requests -->
+            <div class="pharmacy-card">
+                <div class="pharmacy-header">
+                    <h3>Prescription Requests</h3>
+                    <i class="fas fa-prescription"></i>
+                </div>
+                <ul class="medicine-list">
+                    <li class="medicine-item">
+                        <span class="medicine-name">Dr. Smith - Paracetamol</span>
+                        <span class="medicine-stock">Pending</span>
+                    </li>
+                    <li class="medicine-item">
+                        <span class="medicine-name">Dr. Lee - Amoxicillin</span>
+                        <span class="medicine-stock">Approved</span>
+                    </li>
+                    <li class="medicine-item">
+                        <span class="medicine-name">Dr. Brown - Ibuprofen</span>
+                        <span class="medicine-stock">Pending</span>
+                    </li>
+                </ul>
+                <div class="action-buttons">
+                    <button class="btn btn-primary">View All</button>
+                    <button class="btn btn-secondary">Process</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medicine Orders Table -->
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Quantity</th>
+                        <th>Supplier</th>
+                        <th>Order Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Paracetamol</td>
+                        <td>500</td>
+                        <td>MediCorp</td>
+                        <td>2025-02-01</td>
+                        <td>Delivered</td>
+                    </tr>
+                    <tr>
+                        <td>Amoxicillin</td>
+                        <td>200</td>
+                        <td>PharmaPlus</td>
+                        <td>2025-02-05</td>
+                        <td>In Transit</td>
+                    </tr>
+                    <tr>
+                        <td>Ibuprofen</td>
+                        <td>300</td>
+                        <td>HealthLine</td>
+                        <td>2025-02-10</td>
+                        <td>Pending</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Add interactivity here (e.g., search functionality, order processing)
+    </script>
+</body>
+</html>

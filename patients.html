@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Details - MediNexus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Root Variables */
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --accent: #e11d48;
+            --background: #f8fafc;
+            --text: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .branding h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .controls .fa-bell {
+            font-size: 1.2rem;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            height: calc(100vh - 120px);
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .nav-item span {
+            display: none;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+            transform: translateX(8px);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        .nav-item span {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 290px;
+            margin-top: 100px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.collapsed {
+            margin-left: 110px;
+        }
+
+        /* Patient Search Section */
+        .patient-search-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        .patient-search-input {
+            width: 100%;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .patient-search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.1);
+        }
+
+        .patient-details-card {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        .details-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .details-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 80px;
+            }
+
+            .sidebar .nav-item span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 110px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+                padding: 1rem;
+            }
+
+            .nav-item i {
+                font-size: 1rem;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="branding">
+            <h1>MediNexus</h1>
+        </div>
+        <div class="controls">
+            <i class="fas fa-bell"></i>
+            <div class="user-profile">
+                <img src="https://source.unsplash.com/random/400x400" alt="Profile">
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="nav-item active" data-page="dashboard">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="patients">
+            <i class="fas fa-user-injured"></i>
+            <span>Patients</span>
+        </div>
+        <div class="nav-item" data-page="facilities">
+            <i class="fas fa-hospital"></i>
+            <span>Facilities</span>
+        </div>
+        <div class="nav-item" data-page="pharmacy">
+            <i class="fas fa-prescription"></i>
+            <span>Pharmacy</span>
+        </div>
+        <div class="nav-item" data-page="analytics">
+            <i class="fas fa-chart-line"></i>
+            <span>Analytics</span>
+        </div>
+        <div class="nav-item" data-page="connection">
+            <i class="fas fa-network-wired"></i>
+            <span>Hospital to Hospital</span>
+        </div>
+        <div class="nav-item" data-page="doctors">
+            <i class="fas fa-user-md"></i>
+            <span>Doctors</span>
+        </div>
+        <div class="nav-item" data-page="special-doctor">
+            <i class="fas fa-user-nurse"></i>
+            <span>Special Doctor</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="patient-search-container">
+            <h1>Patient Search</h1>
+            <input type="text" 
+                   id="patientId" 
+                   class="patient-search-input"
+                   placeholder="Enter Patient Unique ID" 
+                   oninput="searchPatient()">
+            
+            <div id="patientDetails" class="patient-details-card">
+                <img src="" alt="Profile Photo" class="profile-photo" id="profilePhoto">
+                <div class="details-section">
+                    <h2>Patient Information</h2>
+                    <p><strong>ID:</strong> <span id="id"></span></p>
+                    <p><strong>Name:</strong> <span id="name"></span></p>
+                    <p><strong>Date of Birth:</strong> <span id="dob"></span></p>
+                    <p><strong>ABHA ID:</strong> <span id="abhaId"></span></p>
+                    <p><strong>Aadhaar Number:</strong> <span id="aadhaarNumber"></span></p>
+                </div>
+                <div class="details-section">
+                    <h3>Medical History</h3>
+                    <p><strong>Previous Treatments:</strong> <span id="treatments"></span></p>
+                    <p><strong>Treatments with Other Doctors:</strong> <span id="otherDoctors"></span></p>
+                </div>
+                <div class="details-section">
+                    <h3>Medical Reports</h3>
+                    <a href="" id="reportPdf" target="_blank" class="download-link">
+                        <i class="fas fa-file-pdf"></i> Download Full Report (PDF)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar Collapse Toggle (Optional)
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('collapsed');
+        }
+
+        // Patient Search Functionality
+        const patients = [
+            {
+                id: '12345',
+                name: 'John Doe',
+                dob: '1989-05-15',
+                abhaId: 'ABHA123456789',
+                aadhaarNumber: '1234 5678 9012',
+                profilePhoto: 'https://via.placeholder.com/100',
+                treatments: 'Flu, COVID-19',
+                otherDoctors: 'Dr. Smith - Cardiology, Dr. Lee - Neurology',
+                reportPdf: 'https://example.com/report.pdf'
+            },
+            {
+                id: '67890',
+                name: 'Jane Smith',
+                dob: '1995-08-25',
+                abhaId: 'ABHA987654321',
+                aadhaarNumber: '9876 5432 1098',
+                profilePhoto: 'https://via.placeholder.com/100',
+                treatments: 'Broken Arm, Migraine',
+                otherDoctors: 'Dr. Brown - Orthopedics, Dr. Green - Dermatology',
+                reportPdf: 'https://example.com/report2.pdf'
+            }
+        ];
+
+        function searchPatient() {
+            const patientId = document.getElementById('patientId').value;
+            const patientDetailsDiv = document.getElementById('patientDetails');
+            const patient = patients.find(p => p.id === patientId);
+
+            if (patient) {
+                document.getElementById('id').textContent = patient.id;
+                document.getElementById('name').textContent = patient.name;
+                document.getElementById('dob').textContent = patient.dob;
+                document.getElementById('abhaId').textContent = patient.abhaId;
+                document.getElementById('aadhaarNumber').textContent = patient.aadhaarNumber;
+                document.getElementById('profilePhoto').src = patient.profilePhoto;
+                document.getElementById('treatments').textContent = patient.treatments;
+                document.getElementById('otherDoctors').textContent = patient.otherDoctors;
+                document.getElementById('reportPdf').href = patient.reportPdf;
+                patientDetailsDiv.style.display = 'block';
+            } else {
+                patientDetailsDiv.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

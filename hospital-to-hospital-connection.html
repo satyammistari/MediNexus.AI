@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Network System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <style>
+        /* Root Variables */
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --accent: #e11d48;
+            --background: #f8fafc;
+            --text: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+
+        }
+
+        /* Top Bar */
+        .top-bar {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .branding h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .controls .fa-bell {
+            font-size: 1.2rem;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            height: calc(100vh - 120px);
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .nav-item span {
+            display: none;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+            transform: translateX(8px);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        .nav-item span {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 290px;
+            margin-top: 100px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.collapsed {
+            margin-left: 110px;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f5f7fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            color: #e74c3c;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        /* Map Section */
+        .map-section {
+            height: 500px;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        /* Control Panel */
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .emergency-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .hospital-list {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .hospital-card {
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .hospital-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+
+        .emergency {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .available {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-red {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-red:hover {
+            background: #c0392b;
+        }
+
+        .chat-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+        }
+                /* Responsive Design */
+                @media (max-width: 1024px) {
+            .sidebar {
+                width: 80px;
+            }
+
+            .sidebar .nav-item span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 110px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+                padding: 1rem;
+            }
+
+            .nav-item i {
+                font-size: 1rem;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>National Hospital Network</h1>
+            <p>Emergency Coordination System for Seamless Healthcare Collaboration</p>
+        </div>
+
+
+        <div class="map-section" id="map"></div>
+
+        <div class="control-panel">
+            <div class="emergency-card">
+                <h2>Emergency Actions</h2>
+                <div style="margin: 1.5rem 0;">
+                    <button class="btn btn-red" onclick="openEmergencyModal('blood')">
+                        <i class="fas fa-tint"></i> Request Blood
+                    </button>
+                    <button class="btn btn-red" onclick="openEmergencyModal('organ')">
+                        <i class="fas fa-heart"></i> Organ Transport
+                    </button>
+                    <button class="btn btn-red" onclick="openEmergencyModal('specialist')">
+                        <i class="fas fa-user-md"></i> Request Specialist
+                    </button>
+                </div>
+                <div id="emergencyStatus"></div>
+            </div>
+
+            <div class="hospital-list">
+                <h2>Nearby Hospitals</h2>
+                <div id="hospitalsContainer">
+                    <!-- Hospital cards will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-section">
+            <h2>Cross-Hospital Communication</h2>
+            <div id="chatMessages" style="height: 300px; overflow-y: auto; margin: 1rem 0;"></div>
+            <input type="text" id="messageInput" placeholder="Type message..." style="width: 100%; padding: 1rem;">
+            <button onclick="sendMessage()" class="btn btn-red" style="margin-top: 1rem;">Send Message</button>
+        </div>
+    </div>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="nav-item active" data-page="dashboard">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="patients">
+            <i class="fas fa-user-injured"></i>
+            <span>Patients</span>
+        </div>
+        <div class="nav-item" data-page="facilities">
+            <i class="fas fa-hospital"></i>
+            <span>Facilities</span>
+        </div>
+        <div class="nav-item" data-page="pharmacy">
+            <i class="fas fa-prescription"></i>
+            <span>Pharmacy</span>
+        </div>
+        <div class="nav-item" data-page="analytics">
+            <i class="fas fa-chart-line"></i>
+            <span>Analytics</span>
+        </div>
+        <div class="nav-item" data-page="connection">
+            <i class="fas fa-network-wired"></i>
+            <span>Hospital to Hospital</span>
+        </div>
+        <div class="nav-item" data-page="doctors">
+            <i class="fas fa-user-md"></i>
+            <span>Doctors</span>
+        </div>
+        <div class="nav-item" data-page="special-doctor">
+            <i class="fas fa-user-nurse"></i>
+            <span>Special Doctor</span>
+        </div>
+    </nav>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialize map
+        const map = L.map('map').setView([20.5937, 78.9629], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // Sample hospital data
+        const hospitals = [
+            {
+                name: "AIIMS Delhi",
+                lat: 28.5663,
+                lng: 77.2066,
+                bloodBank: true,
+                organsAvailable: ["Heart", "Kidney"],
+                specialists: ["Cardiologist", "Neurologist"],
+                distance: "15 km"
+            },
+            {
+                name: "Apollo Chennai",
+                lat: 13.0395,
+                lng: 80.2504,
+                bloodBank: true,
+                organsAvailable: ["Liver"],
+                specialists: ["Oncologist"],
+                distance: "25 km"
+            }
+        ];
+
+        // Add hospital markers to map
+        hospitals.forEach(hospital => {
+            const marker = L.marker([hospital.lat, hospital.lng]).addTo(map);
+            marker.bindPopup(`
+                <b>${hospital.name}</b><br>
+                Blood Bank: ${hospital.bloodBank ? 'Available' : 'Unavailable'}<br>
+                Specialists: ${hospital.specialists.join(', ')}
+            `);
+        });
+
+        // Render hospital list
+        const hospitalsContainer = document.getElementById('hospitalsContainer');
+        hospitals.forEach(hospital => {
+            const card = document.createElement('div');
+            card.className = 'hospital-card';
+            card.innerHTML = `
+                <h3>${hospital.name}</h3>
+                <div style="margin: 0.5rem 0;">
+                    <span class="badge available">Blood Bank Available</span>
+                    <span class="badge emergency">Emergency Services</span>
+                </div>
+                <p>Distance: ${hospital.distance}</p>
+                <p>Specialists: ${hospital.specialists.join(', ')}</p>
+                <button onclick="connectToHospital('${hospital.name}')" class="btn btn-red" style="margin-top: 0.5rem;">
+                    Connect Now
+                </button>
+            `;
+            hospitalsContainer.appendChild(card);
+        });
+
+        // Emergency request functions
+        function openEmergencyModal(type) {
+            // Implement modal logic
+            alert(`Opening ${type} request form...`);
+        }
+
+        // Chat system
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const messages = document.getElementById('chatMessages');
+            messages.innerHTML += `<div class="message">${input.value}</div>`;
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // Connection request
+        function connectToHospital(hospitalName) {
+            alert(`Connecting to ${hospitalName}...`);
+        }
+    </script>
+</body>
+</html>

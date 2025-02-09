@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - MediNexus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Root Variables */
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --accent: #e11d48;
+            --background: #f8fafc;
+            --text: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .branding h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .controls .fa-bell {
+            font-size: 1.2rem;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            height: calc(100vh - 120px);
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .nav-item span {
+            display: none;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+            transform: translateX(8px);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        .nav-item span {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 290px;
+            margin-top: 100px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.collapsed {
+            margin-left: 110px;
+        }
+        /* Add these styles to your existing CSS */
+        .analytics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .positive {
+            color: #16a34a;
+        }
+
+        .negative {
+            color: #dc2626;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-top: 1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table th {
+            background: var(--primary);
+            color: white;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="branding">
+            <h1>MediNexus</h1>
+        </div>
+        <div class="controls">
+            <i class="fas fa-bell"></i>
+            <div class="user-profile">
+                <img src="https://source.unsplash.com/random/400x400" alt="Profile">
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="nav-item active" data-page="dashboard">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="patients">
+            <i class="fas fa-user-injured"></i>
+            <span>Patients</span>
+        </div>
+        <div class="nav-item" data-page="facilities">
+            <i class="fas fa-hospital"></i>
+            <span>Facilities</span>
+        </div>
+        <div class="nav-item" data-page="pharmacy">
+            <i class="fas fa-prescription"></i>
+            <span>Pharmacy</span>
+        </div>
+        <div class="nav-item" data-page="analytics">
+            <i class="fas fa-chart-line"></i>
+            <span>Analytics</span>
+        </div>
+        <div class="nav-item" data-page="connection">
+            <i class="fas fa-network-wired"></i>
+            <span>Hospital to Hospital</span>
+        </div>
+        <div class="nav-item" data-page="doctors">
+            <i class="fas fa-user-md"></i>
+            <span>Doctors</span>
+        </div>
+        <div class="nav-item" data-page="special-doctor">
+            <i class="fas fa-user-nurse"></i>
+            <span>Special Doctor</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="analytics-container">
+            <!-- Key Metrics Cards -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h3>Patient Admissions</h3>
+                    <i class="fas fa-user-injured"></i>
+                </div>
+                <div class="metric-value">1,234</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    12.5% vs last month
+                </div>
+                <div class="chart-container">
+                    <canvas id="admissionsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h3>Revenue</h3>
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <div class="metric-value">₹52.3L</div>
+                <div class="metric-change negative">
+                    <i class="fas fa-arrow-down"></i>
+                    4.2% vs last month
+                </div>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h3>Department Distribution</h3>
+                    <i class="fas fa-hospital"></i>
+                </div>
+                <div class="chart-container">
+                    <canvas id="departmentChart"></canvas>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h3>Appointment Types</h3>
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="chart-container">
+                    <canvas id="appointmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table Section -->
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Department</th>
+                        <th>Patients</th>
+                        <th>Avg Stay</th>
+                        <th>Occupancy</th>
+                        <th>Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Cardiology</td>
+                        <td>234</td>
+                        <td>3.2 days</td>
+                        <td>82%</td>
+                        <td>₹12.4L</td>
+                    </tr>
+                    <tr>
+                        <td>Orthopedics</td>
+                        <td>189</td>
+                        <td>4.1 days</td>
+                        <td>75%</td>
+                        <td>₹9.8L</td>
+                    </tr>
+                    <tr>
+                        <td>Neurology</td>
+                        <td>156</td>
+                        <td>2.9 days</td>
+                        <td>68%</td>
+                        <td>₹7.2L</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Admissions Line Chart
+        new Chart(document.getElementById('admissionsChart'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Admissions',
+                    data: [800, 1200, 1000, 1500, 1800, 2000],
+                    borderColor: '#2563eb',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(37, 99, 235, 0.05)'
+                }]
+            }
+        });
+
+        // Revenue Bar Chart
+        new Chart(document.getElementById('revenueChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    label: 'Revenue (₹ Lakhs)',
+                    data: [45, 52, 48, 60],
+                    backgroundColor: '#3b82f6'
+                }]
+            }
+        });
+
+        // Department Doughnut Chart
+        new Chart(document.getElementById('departmentChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Cardiology', 'Orthopedics', 'Neurology', 'Pediatrics'],
+                datasets: [{
+                    data: [35, 25, 20, 20],
+                    backgroundColor: ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd']
+                }]
+            }
+        });
+
+        // Appointment Pie Chart
+        new Chart(document.getElementById('appointmentChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Emergency', 'OPD', 'Follow-up', 'Surgery'],
+                datasets: [{
+                    data: [15, 50, 25, 10],
+                    backgroundColor: ['#e11d48', '#3b82f6', '#10b981', '#f59e0b']
+                }]
+            }
+        });
+    </script>
+</body>
+</html>
